@@ -1,0 +1,28 @@
+services:
+  node:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment:
+      SQUID_CACHE_DIR: /var/spool/squid
+      SQUID_LOG_DIR: /var/log/squid
+      SQUID_USER: proxy
+    volumes:
+      - ../XXX.ovpn:/vpn.ovpn
+      - ./supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+      - squid:/var/spool/squid
+      - ./allow-all.conf:/etc/squid/conf.d/all.conf
+      - ./squid_entrypoint.sh:/squid_entrypoint.sh
+    ports:
+      # - "1080:1080"
+      - "3128:3128"
+      - "9001:9001"
+    user: "0:0"
+    restart: always
+    entrypoint: supervisord
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+volumes:
+  squid:
